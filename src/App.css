@@ -1,2 +1,7 @@
 .App{
+    width: 80%;
+    background-color: #000;
+    margin: auto;
+    display: flex;
+    justify-content: center;
 }
