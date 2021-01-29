@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useMemo } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import VideoControl from './components/videoControl';
 import './index.css'
 const VideoSelf = () => {
@@ -26,29 +26,15 @@ const VideoSelf = () => {
         }, false);
         VideoDom.addEventListener('timeupdate', () => {
             setCurrentTime(VideoDom.currentTime);
-        },false);
+        }, false);
         VideoDom.addEventListener('pause', () => {
             setCurrentTime(VideoDom.currentTime);
-        },false);
+        }, false);
         VideoDom.addEventListener('ended', () => {
             VideoBtnDom.style.display = 'flex'
             VideoBtnDom.innerText = '播放'
         }, false);
     }, [])
-    useMemo(() => {
-        const VideoBtnDom = videoBth.current as HTMLDivElement
-        if (status && VideoBtnDom) {
-            VideoBtnDom.style.display = 'flex'
-            setTimeToHide(5000, VideoBtnDom).then(res => {
-                if (res === 'ok') {
-                    setStatus(false)
-                    clearTimeout(timer);
-                }
-            })
-        }
-        // eslint-disable-next-line 
-    }, [status])
-
     /**
      * 播放视频
      */
@@ -74,8 +60,27 @@ const VideoSelf = () => {
 
         }
     }
+    const changeStatus = async () => {
+        const VideoBtnDom = videoBth.current as HTMLDivElement
+        if (timer) {
+            clearTimeout(timer);
+            VideoBtnDom.style.display = 'none'
+            setStatus(false);
+        } else {
+            setStatus(!status);
+            if (!status) {
+                VideoBtnDom.style.display = 'none'
+            } else {
+                VideoBtnDom.style.display = 'flex'
+                const res = await setTimeToHide(1500, VideoBtnDom);
+                if(res === 'ok'){
+                    clearTimeout(timer);
+                }
+            }
+        }
+    }
     return (
-        <div id='video_box' ref={videoBox} onClick={() => setStatus(true)}>
+        <div id='video_box' ref={videoBox} onClick={changeStatus}>
             <video
                 ref={videoRef}
                 width='100%'
