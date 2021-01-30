@@ -14,6 +14,7 @@ const VideoControl = (props: IProps) => {
     const formatCurrentTime = Math.floor(currentTime);
     const formatTotalTime = Math.floor(totalTime);
     const progress = `${Math.floor(formatCurrentTime / formatTotalTime * 100)}%`
+    // eslint-disable-next-line
     useEffect(() => updateProgress(), [progress]);
     const updateProgress = () => {
         const boxLineDom = boxLine.current as HTMLDivElement
