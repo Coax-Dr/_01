@@ -11,10 +11,10 @@ const VideoSelf = () => {
     let timer: NodeJS.Timeout;
 
     const setTimeToHide = (time: number, node: HTMLDivElement) => {
-        return new Promise(() => {
+        return new Promise((resolve) => {
             timer = setTimeout(() => {
                 node.style.display = 'none'
-                clearTimeout(timer)
+                resolve('ok');
             }, time)
         })
     }
@@ -48,56 +48,43 @@ const VideoSelf = () => {
         const VideoBtnDom = videoBth.current as HTMLDivElement
         if (VideoDom.ended) {
             // 视频播放完毕
-            VideoDom.play();
+            VideoDom.play(); // 播放
             VideoBtnDom.innerText = '暂停'
         } else if (VideoDom.paused) {
             // 视频暂停
-            VideoDom.play()
+            VideoDom.play(); // 播放
             VideoBtnDom.innerText = '暂停'
         } else {
             // 视频播放中
-            VideoDom.pause()
+            VideoDom.pause(); // 暂停
             VideoBtnDom.innerText = '播放'
         }
-        if (!VideoDom.paused && !VideoDom.ended) {
-            const res = await setTimeToHide(1500, VideoBtnDom);
-            if (res === 'ok') {
-                setStatus(false);
-                clearTimeout(timer);
-            }
-
+        clearTimeout(timer);
+        const res = await setTimeToHide(3000, VideoBtnDom);
+        if(res === 'ok'){
+            clearTimeout(timer);
+            setStatus(false);
         }
     }
-    const changeStatus = () => {
+    const changeStatus = async () => {
         // 点击视频区域
         const VideoBtnDom = videoBth.current as HTMLDivElement;
         const isRendered = VideoBtnDom.style.display === 'flex';
-        console.log('定时器', timer);
         if(isRendered){
             // 播放按钮已经渲染
-            VideoBtnDom.style.display = 'none'; // 消失
             clearTimeout(timer);
+            VideoBtnDom.style.display = 'none'; // 消失
+            setStatus(false);
         } else {
             // 播放按钮未渲染
             VideoBtnDom.style.display = 'flex'; // 显示
-            setTimeToHide(1500, VideoBtnDom);
+            setStatus(true);
+            const res = await setTimeToHide(3000, VideoBtnDom);
+            if(res === 'ok') {
+                clearTimeout(timer);
+                setStatus(false);
+            }
         }
-        // if (timer) {
-        //     clearTimeout(timer);
-        //     VideoBtnDom.style.display = 'none'
-        //     setStatus(false);
-        // } else {
-        //     setStatus(!status);
-        //     if (!status) {
-        //         VideoBtnDom.style.display = 'none'
-        //     } else {
-        //         VideoBtnDom.style.display = 'flex'
-        //         const res = await setTimeToHide(1500, VideoBtnDom);
-        //         if(res === 'ok'){
-        //             clearTimeout(timer);
-        //         }
-        //     }
-        // }
     }
     return (
         <div id='video_box' ref={videoBox} onClick={changeStatus}>
@@ -110,7 +97,7 @@ const VideoSelf = () => {
                 <source src={videoLink} type='video/mp4' />
             </video>
             <div className='video_play' ref={videoBth} onClick={(e: any) => playVideo(e)}>播放</div>
-            <VideoControl status={status ? 'control' : 'progress'} currentTime={currentTime} totalTime={videoRef.current?.duration} />
+            <VideoControl status={status ? 'control' : 'show'} currentTime={currentTime} totalTime={videoRef.current?.duration ?? 0} />
         </div>
     )
 }
